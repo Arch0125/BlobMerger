@@ -11,7 +11,7 @@ app.use(bodyParser.json());
 
 let currentBatch = [];
 let nextId = 1; // Initial ID for the first submission
-let allSubmissions = [];
+let allSubmissions = {};
 
 function createBlob(blobBatch) {
   let tempBlobBatch = blobBatch;
@@ -48,8 +48,6 @@ function createBlob(blobBatch) {
 
   console.log(submissions);
 
-  allSubmissions = allSubmissions.concat(submissions); // Correctly concatenate to allSubmissions
-
   tempBlobBatch = tempBlobBatch.slice(blobSize); // Update the remaining batch
   return { hexBlobData: blobData, tempBlobBatch, submissions };
 }
@@ -67,6 +65,8 @@ async function sortAndSubmitBatch() {
     console.log("Submitting blob data :", hexBlobData);
     const hash = await blobSubmit(hexBlobData);
     console.log("Blob submitted with transaction hash :", hash);
+    allSubmissions[hash] = submissions;
+    console.log(allSubmissions);
   }
   // You might want to handle or store submissions results here
 }
