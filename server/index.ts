@@ -4,6 +4,7 @@ import bodyParser from "body-parser";
 import { ethers } from "ethers";
 import { stringToHex } from "viem";
 import { blobSubmit } from "./helpers/blobSubmit";
+import { register } from "./helpers/mruhelper";
 
 const app = express();
 app.use(cors());
@@ -80,12 +81,24 @@ app.post("/submitBlobData", (req, res) => {
   res.status(200).send(`Blob data added successfully with ID ${nextId - 1}.`);
 });
 
+app.post("/registerAddress", async (req, res) => {
+  const { address } = req.body;
+  try {
+    await register(address);
+    console.log("Address registered with Blob Merger !");
+    console.log("Now you can start posting data to Blobs");
+    res.status(200).send("Registration successful");
+  } catch (err) {
+    res.status(400).send(err);
+  }
+});
+
 app.get("/getAllSubmissions", (req, res) => {
   res.status(200).send(allSubmissions);
 });
 
-app.listen(3000, () => {
-  console.log("Blob merger listening on port 3000");
+app.listen(3001, () => {
+  console.log("Blob merger listening on port 3001");
 });
 
 setInterval(sortAndSubmitBatch, 5000);
