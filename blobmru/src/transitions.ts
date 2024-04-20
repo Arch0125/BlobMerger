@@ -37,9 +37,6 @@ const submitblob: STF<ERC20, BaseActionInput> = {
     const { address, txHash, startIndex, endIndex } = inputs;
 
     const index = findIndexOfAccount(state, address);
-    if (state.leaves[index].address !== msgSender) {
-      throw new Error("Unauthorized");
-    }
     state.leaves[index].blobSubmissions.push({ txHash, startIndex, endIndex });
     return state;
   },

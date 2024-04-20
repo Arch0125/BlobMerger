@@ -10,7 +10,7 @@ export async function blobSubmit(
   const hash = await client.sendTransaction({
     blobs,
     kzg,
-    maxFeePerBlobGas: parseGwei("30"),
+    maxFeePerBlobGas: parseGwei("50"),
     to: "0x0000000000000000000000000000000000000000",
   });
 

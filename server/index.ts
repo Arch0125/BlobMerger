@@ -5,6 +5,7 @@ import { ethers } from "ethers";
 import { stringToHex } from "viem";
 import { blobSubmit } from "./helpers/blobSubmit";
 import { register } from "./helpers/mruhelper";
+import { submitAttestation } from "./helpers/attestation";
 
 const app = express();
 app.use(cors());
@@ -40,6 +41,7 @@ function createBlob(blobBatch) {
       endByte: endPosition,
       bytesUsed: ethers.dataLength(hexData),
       status: "BATCHED",
+      attestation: "",
     });
 
     blobData = concatBlobData;
@@ -66,8 +68,21 @@ async function sortAndSubmitBatch() {
     console.log("Submitting blob data :", hexBlobData);
     const hash = await blobSubmit(hexBlobData);
     console.log("Blob submitted with transaction hash :", hash);
+    await Promise.all(submissions.map(async (submission) => {
+      submission.status = "SUBMITTED";
+      const attestation = await submitAttestation(
+        submission.senderAddr,
+        hash,
+        submission.startByte,
+        submission.endByte,
+        hexBlobData,
+      );
+      console.log(attestation);
+      submission.attestation = attestation;
+    }));
     allSubmissions[hash] = submissions;
-    console.log(allSubmissions);
+    console.log(submissions);
+    console.log("Blob submitted with transaction hash :", hash);
   }
   // You might want to handle or store submissions results here
 }

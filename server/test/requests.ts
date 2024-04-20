@@ -22,7 +22,7 @@ async function sendRequests() {
     senderAddr: wallet.address,
     blobData: data,
   });
-  const res = await axios.post("http://localhost:3000/submitBlobData", {
+  const res = await axios.post("http://localhost:3001/submitBlobData", {
     senderAddr: wallet.address,
     blobData: data,
   });
