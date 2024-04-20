@@ -6,6 +6,7 @@ import { stringToHex } from "viem";
 import { blobSubmit } from "./helpers/blobSubmit";
 import { register } from "./helpers/mruhelper";
 import { submitAttestation } from "./helpers/attestation";
+import { commitUsingWitness } from "./helpers/witness";
 
 const app = express();
 app.use(cors());
@@ -42,6 +43,7 @@ function createBlob(blobBatch) {
       bytesUsed: ethers.dataLength(hexData),
       status: "BATCHED",
       attestation: "",
+      commitment: "",
     });
 
     blobData = concatBlobData;
@@ -68,23 +70,25 @@ async function sortAndSubmitBatch() {
     console.log("Submitting blob data :", hexBlobData);
     const hash = await blobSubmit(hexBlobData);
     console.log("Blob submitted with transaction hash :", hash);
-    await Promise.all(submissions.map(async (submission) => {
-      submission.status = "SUBMITTED";
-      const attestation = await submitAttestation(
-        submission.senderAddr,
-        hash,
-        submission.startByte,
-        submission.endByte,
-        hexBlobData,
-      );
-      console.log(attestation);
-      submission.attestation = attestation;
-    }));
+    await Promise.all(
+      submissions.map(async (submission) => {
+        submission.status = "SUBMITTED";
+        const attestation = await submitAttestation(
+          submission.senderAddr,
+          hash,
+          submission.startByte,
+          submission.endByte,
+          hexBlobData
+        );
+        const commitment = await commitUsingWitness(ethers.keccak256(ethers.toUtf8Bytes(attestation)));
+        submission.attestation = attestation;
+        submission.commitment = commitment;
+      })
+    );
     allSubmissions[hash] = submissions;
     console.log(submissions);
     console.log("Blob submitted with transaction hash :", hash);
   }
-  // You might want to handle or store submissions results here
 }
 
 app.post("/submitBlobData", (req, res) => {
