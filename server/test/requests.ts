@@ -15,14 +15,14 @@ function generateString(length) {
 }
 
 async function sendRequests() {
-  const wallet = ethers.Wallet.createRandom();
+  const wallet = new ethers.Wallet("5b1c32040fad747da544476076de2997bbb06c39353d96a4d72b1db3e60bcc82");
   const randomString = generateString(Math.round(Math.random() * 10));
   const data = randomString;
   console.log({
     senderAddr: wallet.address,
     blobData: data,
   });
-  const res = await axios.post("http://localhost:3001/submitBlobData", {
+  const res = await axios.post("http://localhost:3002/submitBlobData", {
     senderAddr: wallet.address,
     blobData: data,
   });

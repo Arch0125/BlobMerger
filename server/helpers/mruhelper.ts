@@ -50,15 +50,24 @@ export async function register(address: string) {
   console.log(await axios.post("http://localhost:3000/create", body));
 }
 
-export async function sendBlob() {
+export async function sendBlob(
+  address: string,
+  txHash: string,
+  startIndex: number,
+  endIndex: number,
+  attestation: string,
+  commitment: string,
+) {
   const actionName = "submitblob";
   const schema = schemas[actionName];
   const msgSender = bobWallet.address;
   const inputs = {
-    address: msgSender,
-    txHash: "0xabcde",
-    startIndex: 2,
-    endIndex: 21,
+    address: address,
+    txHash: txHash,
+    startIndex: startIndex,
+    endIndex: endIndex,
+    attestation: attestation,
+    commitment: commitment,
   };
 
   const signature = await bobWallet.signTypedData(
@@ -77,5 +86,3 @@ export async function sendBlob() {
 
   console.log(await axios.post("http://localhost:3000/submitblob", body));
 }
-
-register();

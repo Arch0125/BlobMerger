@@ -4,9 +4,10 @@ import bodyParser from "body-parser";
 import { ethers } from "ethers";
 import { stringToHex } from "viem";
 import { blobSubmit } from "./helpers/blobSubmit";
-import { register } from "./helpers/mruhelper";
+import { register, sendBlob } from "./helpers/mruhelper";
 import { submitAttestation } from "./helpers/attestation";
 import { commitUsingWitness } from "./helpers/witness";
+import { submitBlobToContract } from "./helpers/contract";
 
 const app = express();
 app.use(cors());
@@ -69,7 +70,6 @@ async function sortAndSubmitBatch() {
   if (ethers.dataLength(hexBlobData) != 0) {
     console.log("Submitting blob data :", hexBlobData);
     const hash = await blobSubmit(hexBlobData);
-    console.log("Blob submitted with transaction hash :", hash);
     await Promise.all(
       submissions.map(async (submission) => {
         submission.status = "SUBMITTED";
@@ -78,12 +78,24 @@ async function sortAndSubmitBatch() {
           hash,
           submission.startByte,
           submission.endByte,
-          hexBlobData
+          hexBlobData,
         );
-        const commitment = await commitUsingWitness(ethers.keccak256(ethers.toUtf8Bytes(attestation)));
+        const commitment = await commitUsingWitness(
+          ethers.keccak256(ethers.toUtf8Bytes(attestation)),
+        );
         submission.attestation = attestation;
         submission.commitment = commitment;
-      })
+        await sendBlob(
+          submission.senderAddr,
+          hash,
+          submission.startByte,
+          submission.endByte,
+          submission.attestation,
+          submission.commitment,
+        );
+        const blobSubmissionFee = (0.003712586046111744*1e18 * ((submission.endByte+1 - submission.startByte)/2))/131072;
+        await submitBlobToContract(blobSubmissionFee,submission.senderAddr)
+      }),
     );
     allSubmissions[hash] = submissions;
     console.log(submissions);
@@ -116,8 +128,8 @@ app.get("/getAllSubmissions", (req, res) => {
   res.status(200).send(allSubmissions);
 });
 
-app.listen(3001, () => {
-  console.log("Blob merger listening on port 3001");
+app.listen(3002, () => {
+  console.log("Blob merger listening on port 3002");
 });
 
 setInterval(sortAndSubmitBatch, 5000);
