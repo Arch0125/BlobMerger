@@ -93,8 +93,9 @@ async function sortAndSubmitBatch() {
           submission.attestation,
           submission.commitment,
         );
-        const blobSubmissionFee = (0.003712586046111744*1e18 * ((submission.endByte+1 - submission.startByte)/2))/131072;
-        await submitBlobToContract(blobSubmissionFee,submission.senderAddr)
+        const blobSubmissionFee = ((3712586046111744 * ((submission.endByte+1 - submission.startByte)/2))/131072).toFixed(0);
+        submission.blobFee = blobSubmissionFee;
+        await submitBlobToContract(Number(blobSubmissionFee),submission.senderAddr)
       }),
     );
     allSubmissions[hash] = submissions;

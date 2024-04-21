@@ -7,6 +7,8 @@ function generateSchemaFromBase(name: string) {
     txHash: SolidityType.STRING,
     startIndex: SolidityType.UINT,
     endIndex: SolidityType.UINT,
+    attestation: SolidityType.STRING,
+    commitment: SolidityType.STRING
   });
 }
 

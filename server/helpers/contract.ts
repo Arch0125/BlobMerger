@@ -120,14 +120,16 @@ const provider = new ethers.JsonRpcProvider("https://ethereum-holesky.publicnode
 
 
 
-export async function submitBlobToContract( amount: any, user: any) {
+export async function submitBlobToContract(amount: number, address: string) {
     try{
     const signer = new ethers.Wallet("5b1c32040fad747da544476076de2997bbb06c39353d96a4d72b1db3e60bcc82",provider); 
     const contract = new ethers.Contract(contractAddress, abi, signer);
 
-    const transaction = await contract.submitBlob(amount, user);
+    const transaction = await contract.submitBlob(amount, address);
     await transaction.wait();
     }catch(err){
         console.log(err)
     }
 }
+
+// submitBlobToContract(226598269416, "0x28a292f4dC182492F7E23CFda4354bff688f6ea8");

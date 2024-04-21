@@ -82,6 +82,18 @@ app.get("/", (_req: Request, res: Response) => {
   return res.send({ state: erc20Machine?.state });
 });
 
+app.get("/fetchBlob", (_req:Request, _res: Response)=>{
+  const data = erc20Machine?.state;
+  const address = _req.params.address;
+  const txHash = _req.params.txHash;
+  let blobSubmissionDetails={}
+  data?.map((submission)=>{
+    if(submission.address === address){
+      
+    }
+  })
+})
+
 app.listen(3000, () => {
   console.log("listening on port 3000");
 });

@@ -15,6 +15,8 @@ type BaseActionInput = {
   txHash: string;
   startIndex: number;
   endIndex: number;
+  attestation:string;
+  commitment: string;
 };
 
 // --------- State Transition Handlers ---------
@@ -34,10 +36,17 @@ const create: STF<ERC20, CreateInput> = {
 
 const submitblob: STF<ERC20, BaseActionInput> = {
   handler: ({ inputs, state, msgSender }) => {
-    const { address, txHash, startIndex, endIndex } = inputs;
+    const { address, txHash, startIndex, endIndex, attestation, commitment } = inputs;
 
     const index = findIndexOfAccount(state, address);
-    state.leaves[index].blobSubmissions.push({ txHash, startIndex, endIndex });
+    if(index == -1){
+      state.leaves.push({
+        address,
+        blobSubmissions: [],
+      });
+    }
+    const index1 = findIndexOfAccount(state, address);
+    state.leaves[index1].blobSubmissions.push({ txHash, startIndex, endIndex, attestation, commitment });
     return state;
   },
 };

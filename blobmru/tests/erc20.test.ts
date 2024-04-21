@@ -56,9 +56,11 @@ async function sendBlob() {
   const msgSender = bobWallet.address;
   const inputs = {
     address: msgSender,
-    txHash: "0xabcde",
+    txHash: "0xabc",
     startIndex: 2,
     endIndex: 21,
+    attestation:"abc",
+    commitment:"abc"
   };
 
   const signature = await bobWallet.signTypedData(

@@ -36,7 +36,7 @@ async function sendRequests() {
 }
 
 function main() {
-  let limit = 10;
+  let limit = 2;
   while (limit > 0) {
     sendRequests();
     limit--;

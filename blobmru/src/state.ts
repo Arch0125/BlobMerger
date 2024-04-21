@@ -8,6 +8,8 @@ export type Leaves = {
     txHash: string;
     startIndex: number;
     endIndex: number;
+    attestation:string;
+    commitment:string;
   }[];
 }[];
 
